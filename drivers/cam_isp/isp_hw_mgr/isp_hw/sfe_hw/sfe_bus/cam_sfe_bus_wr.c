@@ -2167,17 +2167,23 @@ static int cam_sfe_bus_wr_err_irq_top_half(uint32_t evt_id,
 {
 
 	int i = 0, rc = 0;
+	uint32_t status = 0;
 	struct cam_sfe_bus_wr_priv *bus_priv =
 		th_payload->handler_priv;
 	struct cam_sfe_bus_wr_irq_evt_payload *evt_payload;
 
-	CAM_ERR_RATE_LIMIT(CAM_ISP, "SFE:%d BUS Err IRQ",
-		bus_priv->common_data.core_index);
-
 	for (i = 0; i < th_payload->num_registers; i++) {
-		CAM_ERR_RATE_LIMIT(CAM_ISP, "SFE:%d BUS IRQ status_%d: 0x%X",
-		bus_priv->common_data.core_index, i,
-			th_payload->evt_status_arr[i]);
+	    status = th_payload->evt_status_arr[i];
+		
+		if ((status & CAM_SFE_BUS_WR_IRQ_CCIF_VIOLATION) || 
+		(status & CAM_SFE_BUS_WR_IRQ_IMAGE_SIZE_VIOLATION)){
+			CAM_ERR_RATE_LIMIT(CAM_ISP, "SFE:%d BUS Err IRQ",
+				bus_priv->common_data.core_index);
+		
+		    CAM_ERR_RATE_LIMIT(CAM_ISP, "SFE:%d BUS IRQ status_%d: 0x%X",
+				bus_priv->common_data.core_index, i,
+				th_payload->evt_status_arr[i]);
+		}
 	}
 	cam_irq_controller_disable_irq(
 		bus_priv->common_data.bus_irq_controller,
@@ -2241,7 +2247,7 @@ static int cam_sfe_bus_wr_irq_bottom_half(
 	void *handler_priv, void *evt_payload_priv)
 {
 	int i;
-	uint32_t status = 0, cons_violation = 0;
+	uint32_t status = 0;
 	bool skip_err_notify = false;
 	struct cam_sfe_bus_wr_priv            *bus_priv = handler_priv;
 	struct cam_sfe_bus_wr_common_data     *common_data;
@@ -2254,21 +2260,26 @@ static int cam_sfe_bus_wr_irq_bottom_half(
 	common_data = &bus_priv->common_data;
 
 	status = evt_payload->irq_reg_val[CAM_SFE_IRQ_BUS_REG_STATUS0];
-	cons_violation = (status >> 28) & 0x1;
 
-	CAM_ERR(CAM_SFE,
-		"SFE:%d status0 0x%x Image Size violation status 0x%x CCIF violation status 0x%x",
-		bus_priv->common_data.core_index, status,
-		evt_payload->image_size_violation_status,
-		evt_payload->ccif_violation_status);
+	if (status & CAM_SFE_BUS_WR_IRQ_CCIF_VIOLATION)
+		CAM_ERR(CAM_SFE, "SFE:%d status0 0x%x CCIF Violation status 0x%x",
+			bus_priv->common_data.core_index, status,
+			evt_payload->ccif_violation_status);
 
-	if (evt_payload->image_size_violation_status)
+	if (status & CAM_SFE_BUS_WR_IRQ_IMAGE_SIZE_VIOLATION) {
+		CAM_ERR(CAM_SFE, "SFE:%d status0 0x%x Image Size Violation status 0x%x",
+			bus_priv->common_data.core_index, status,
+			evt_payload->image_size_violation_status);
 		cam_sfe_bus_wr_print_violation_info(
 			evt_payload->image_size_violation_status,
 			bus_priv);
+	}
 
-	if (cons_violation)
+	if (status & CAM_SFE_BUS_WR_IRQ_CONS_VIOLATION) {
+		CAM_WARN(CAM_SFE, "SFE:%d status0 0x%x Constraint Violation",
+			bus_priv->common_data.core_index, status);
 		cam_sfe_bus_wr_get_constraint_errors(&skip_err_notify, bus_priv);
+	}
 
 	cam_sfe_bus_wr_put_evt_payload(common_data, &evt_payload);
 
