@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Copyright (c) 2017-2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
  */
 
 #ifndef _CAM_ISP_CONTEXT_H_
@@ -287,6 +287,8 @@ struct cam_isp_context_event_record {
  * @v4l2_event_sub_ids         contains individual bits representing subscribed v4l2 ids
  * @aeb_enabled:               Indicate if stream is for AEB
  * @do_internal_recovery:      Enable KMD halt/reset/resume internal recovery
+ * @vfe_bus_comp_grp:          Vfe bus comp group record
+ * @sfe_bus_comp_grp:          Sfe bus comp group record
  *
  */
 struct cam_isp_context {
@@ -342,6 +344,8 @@ struct cam_isp_context {
 	uint32_t                              v4l2_event_sub_ids;
 	bool                                  aeb_enabled;
 	bool                                  do_internal_recovery;
+	struct cam_isp_hw_comp_record        *vfe_bus_comp_grp;
+	struct cam_isp_hw_comp_record        *sfe_bus_comp_grp;
 };
 
 /**
@@ -506,5 +510,29 @@ int cam_isp_context_init(struct cam_isp_context *ctx,
  *
  */
 int cam_isp_context_deinit(struct cam_isp_context *ctx);
+
+/**
+ * cam_isp_detect_framerate()
+ *
+ * @brief:                  function to detect framerate - XiaoMi add
+ *
+ * @ctx:                    ISP context obj to be detected
+ * @interval:               frame interval number to calculate framerate
+ *
+ */
+void cam_isp_detect_framerate(struct cam_isp_context *ctx,
+	uint interval);
+
+/**
+ * cam_isp_GetFrameBatchsize()
+ *
+ * @brief:                  function to get frame batchsize of HFR - XiaoMi add
+ *
+ * @ctx:                    ISP context obj to be detected
+ * @cpkt:                   Camera packet
+ *
+ */
+void cam_isp_GetFrameBatchsize(struct cam_context *ctx,
+	struct cam_packet  *cpkt);
 
 #endif  /* __CAM_ISP_CONTEXT_H__ */

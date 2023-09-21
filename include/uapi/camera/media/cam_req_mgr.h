@@ -34,6 +34,7 @@
 #define CAM_TFE_DEVICE_TYPE       (CAM_DEVICE_TYPE_BASE + 16)
 #define CAM_CRE_DEVICE_TYPE       (CAM_DEVICE_TYPE_BASE + 17)
 #define CAM_TPG_DEVICE_TYPE       (CAM_DEVICE_TYPE_BASE + 18)
+#define CAM_ISPV3_DEVICE_TYPE     (CAM_DEVICE_TYPE_BASE + 20)
 
 /* cam_req_mgr hdl info */
 #define CAM_REQ_MGR_HDL_IDX_POS           8
@@ -58,6 +59,17 @@
 #define V4L_EVENT_CAM_REQ_MGR_CUSTOM_EVT                                3
 #define V4L_EVENT_CAM_REQ_MGR_NODE_EVENT                                4
 #define V4L_EVENT_CAM_REQ_MGR_SOF_UNIFIED_TS                            5
+#define V4L_EVENT_CAM_REQ_MGR_ISPV3_MISN_SOF                            6
+#define V4L_EVENT_CAM_REQ_MGR_ISPV3_MISN_LSC                            7
+#define V4L_EVENT_CAM_REQ_MGR_ISPV3_TXLM_SOF                            8
+#define V4L_EVENT_CAM_REQ_MGR_POLL_EXIT                                 9
+
+/* Add by xiaomi V4L event type which user space will subscribe to*/
+#define V4L_EVENT_HW_ISSUE_EVENT       		(V4L2_EVENT_PRIVATE_START + 1)
+/* Add by xiaomi Specific event ids to get notified in user space */
+#define V4L_EVENT_HW_ISSUE_ERROR                                        20
+#define V4L_EVENT_HW_ISSUE_CCI_ERROR   		(V4L_EVENT_HW_ISSUE_ERROR + 1)
+#define V4L_EVENT_HW_ISSUE_POWER_ERROR 		(V4L_EVENT_HW_ISSUE_ERROR + 2)
 
 /* SOF Event status */
 #define CAM_REQ_MGR_SOF_EVENT_SUCCESS           0
@@ -475,6 +487,36 @@ struct cam_mem_cache_ops_cmd {
 #define CAM_REQ_MGR_ICP_SYSTEM_FAILURE                   BIT(11)
 #define CAM_REQ_MGR_CSID_MISSING_EOT                     BIT(12)
 #define CAM_REQ_MGR_CSID_RX_PKT_PAYLOAD_CORRUPTION       BIT(13)
+
+
+/**
+ * add by xiaomi
+ * HW ISSUE : error message type
+ * @HW_ISSUE_ERROR_TYPE_SENSOR_POWER: Sensor Power error
+ * @HW_ISSUE_ERROR_TYPE_SENSOR_CCI: Sensor CCI error
+ * @HW_ISSUE_ERROR_TYPE_ACTUATOR_POWER: Actuator Power error
+ * @HW_ISSUE_ERROR_TYPE_ACTUATOR_CCI: Actuator CCI error
+ * @HW_ISSUE_ERROR_TYPE_EEPROM_POWER: EEprom Power error
+ * @HW_ISSUE_ERROR_TYPE_EEPROM_CCI: EEprom CCI error
+ */
+#define HW_ISSUE_ERROR_TYPE_SENSOR_POWER				0
+#define HW_ISSUE_ERROR_TYPE_SENSOR_CCI					1
+#define HW_ISSUE_ERROR_TYPE_ACTUATOR_POWER				3
+#define HW_ISSUE_ERROR_TYPE_ACTUATOR_CCI				4
+#define HW_ISSUE_ERROR_TYPE_EEPROM_POWER				5
+#define HW_ISSUE_ERROR_TYPE_EEPROM_CCI					6
+
+/**
+ * add by xiaomi
+ * HW ISSUE : Error codes
+ * @HW_ISSUE_HW_CCI_READ_ERROR					: CCI_READ_ERROR
+ * @HW_ISSUE_HW_CCI_WRITE_ERROR					: CCI_WRITE_ERROR
+ * @HW_ISSUE_HW_CCI_POLL_ERROR					: CCI_POLL_ERROR
+ */
+#define HW_ISSUE_HW_CCI_READ_ERROR                   	 0
+#define HW_ISSUE_HW_CCI_WRITE_ERROR                  	 1
+#define HW_ISSUE_HW_CCI_POLL_ERROR                   	 2
+
 
 /**
  * struct cam_req_mgr_error_msg

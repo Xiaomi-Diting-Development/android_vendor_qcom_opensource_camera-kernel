@@ -87,6 +87,7 @@ struct sensor_intf_params {
  * @pipeline_delay: Sensor pipeline delay
  * @sensor_name: Sensor name
  * @is_aon_user: To determine whether sensor is AON user or not
+ * @trigger_source: Indicate the trigger source
  */
 struct cam_sensor_ctrl_t {
 	char                           device_name[
@@ -117,6 +118,9 @@ struct cam_sensor_ctrl_t {
 	char                           sensor_name[
 		CAM_SENSOR_NAME_MAX_SIZE];
 	bool                           is_aon_user;
+#if IS_ENABLED(CONFIG_ISPV3)
+	enum cam_req_mgr_trigger_source trigger_source;
+#endif
 };
 
 /**

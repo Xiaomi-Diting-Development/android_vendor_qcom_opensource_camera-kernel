@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
  * Copyright (c) 2017-2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022-2023, Qualcomm Innovation Center, Inc. All rights reserved.
  */
 
 #ifndef _CAM_IFE_HW_MGR_H_
@@ -260,6 +261,7 @@ struct cam_ife_cdm_user_data {
  * @current_mup:            Current MUP val, scratch will then apply the same as previously
  *                          applied request
  * @curr_num_exp:           Current num of exposures
+ * @is_frame_setting_update:Flag to specify the per frame setting has updated or not
  *
  */
 struct cam_ife_hw_mgr_ctx {
@@ -317,6 +319,9 @@ struct cam_ife_hw_mgr_ctx {
 	atomic_t                          recovery_id;
 	uint32_t                          current_mup;
 	uint32_t                          curr_num_exp;
+	bool                              is_frame_setting_update;
+	struct cam_isp_hw_comp_record             *vfe_bus_comp_grp;
+	struct cam_isp_hw_comp_record             *sfe_bus_comp_grp;
 };
 
 /**
@@ -366,6 +371,7 @@ struct cam_isp_sys_cache_info {
  * @hw_pid_support         hw pid support for this target
  * @csid_rup_en            Reg update at CSID side
  * @csid_global_reset_en   CSID global reset enable
+ * @csid_camif_irq_support CSID camif IRQ support
  * @isp_bus_caps           Capability of underlying SFE/IFE bus HW
  * @path_port_map          Mapping of outport to IFE mux
  */
@@ -391,6 +397,7 @@ struct cam_ife_hw_mgr {
 	bool                             hw_pid_support;
 	bool                             csid_rup_en;
 	bool                             csid_global_reset_en;
+	bool                             csid_camif_irq_support;
 	struct cam_isp_bus_hw_caps       isp_bus_caps;
 	struct cam_isp_hw_path_port_map  path_port_map;
 
